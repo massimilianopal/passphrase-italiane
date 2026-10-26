@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Genera passphrase italiane con Diceware e password pronunciabili per Telemaco. Tutto avviene nel browser.">
+  <meta name="theme-color" content="#111b2d">
+  <title>Passphrase italiane — Generatore locale</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <header class="hero">
+      <div class="eyebrow"><span class="signal" aria-hidden="true"></span> OPEN SOURCE · NESSUN ACCOUNT</div>
+      <h1>Passphrase <span>italiane.</span></h1>
+      <p>Parole facili da ricordare, selezionate in modo crittograficamente casuale. Senza inviare le password a un server.</p>
+    </header>
+
+    <main class="workspace">
+      <div class="tablist" role="tablist" aria-label="Modalità del generatore">
+        <button id="tab-italiano" class="tab active" role="tab" aria-controls="panel-italiano" aria-selected="true" type="button">Passphrase italiane</button>
+        <button id="tab-telemaco" class="tab" role="tab" aria-controls="panel-telemaco" aria-selected="false" type="button" tabindex="-1">Modalità Telemaco</button>
+      </div>
+
+      <section id="panel-italiano" class="settings" role="tabpanel" aria-labelledby="tab-italiano">
+        <div class="section-heading"><div><h2>Componi una passphrase</h2><p>Ogni voce è estratta in modo indipendente.</p></div><span class="pill">Dizionario italiano v4</span></div>
+        <div class="control">
+          <div class="control-label"><label for="word-count">Numero di parole</label><output id="word-count-value" for="word-count">6</output></div>
+          <input id="word-count" type="range" min="4" max="10" value="6" step="1">
+          <div class="range-labels"><span>4 parole</span><span>10 parole</span></div>
+        </div>
+        <div class="two-cols">
+          <div class="control"><label for="separator">Separatore</label>
+            <select id="separator">
+              <option value="-">Trattino ( - )</option>
+              <option value=".">Punto ( . )</option>
+              <option value=" ">Spazio</option>
+              <option value="">Nessuno</option>
+            </select>
+          </div>
+          <div class="control"><label for="vocabulary">Vocabolario</label>
+            <select id="vocabulary">
+              <option value="letters">Solo voci alfabetiche</option>
+              <option value="all">Diceware completo (7.776)</option>
+            </select>
+          </div>
+        </div>
+        <div class="checks">
+          <label class="check"><input type="checkbox" id="uppercase-words"> Iniziale maiuscola per ogni voce</label>
+          <label class="check"><input type="checkbox" id="append-number"> Aggiungi una cifra finale</label>
+        </div>
+        <p class="explanation">La lista integrale contiene anche cifre, abbreviazioni e simboli. La modalità predefinita seleziona soltanto voci alfabetiche da 3 a 6 caratteri.</p>
+      </section>
+
+      <section id="panel-telemaco" class="settings" role="tabpanel" aria-labelledby="tab-telemaco" hidden>
+        <div class="section-heading"><div><h2>Compatibilità Telemaco</h2><p>Gruppi pronunciabili, non parole di dizionario.</p></div><span class="pill">20 caratteri</span></div>
+        <div class="control"><label for="username">User ID da escludere <span class="optional">(facoltativo)</span></label>
+          <input id="username" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Inseriscilo solo se vuoi escluderlo">
+          <p class="hint">Usato soltanto per il controllo in memoria; non viene trasmesso né salvato.</p>
+        </div>
+        <label class="check"><input type="checkbox" id="telemaco-uppercase" checked> Inserisci una lettera maiuscola casuale</label>
+        <div class="rules">
+          <strong>Regole applicate localmente</strong>
+          <p>20 caratteri, lettere e numeri, simboli tra <code>! ? * : .</code>, niente tre caratteri identici consecutivi, sequenze banali note o parole complete della lista nei singoli gruppi.</p>
+          <p><strong>Limite:</strong> Telemaco può comunque rifiutare una proposta per nomi propri, somiglianza con password precedenti o altri controlli non documentati.</p>
+        </div>
+      </section>
+
+      <div class="actions"><button id="generate" class="primary" type="button">Genera passphrase <span aria-hidden="true">↗</span></button></div>
+
+      <section class="result-card" aria-labelledby="result-title">
+        <div class="result-heading"><h2 id="result-title">Risultato</h2><span id="entropy" class="entropy">—</span></div>
+        <div class="output-wrap"><output id="result" class="output" aria-live="polite">Premi “Genera passphrase”</output></div>
+        <div class="result-actions">
+          <button type="button" id="copy" class="secondary" disabled>Copia</button>
+          <button type="button" id="hide" class="quiet" disabled>Nascondi</button>
+        </div>
+        <p id="status" role="status" class="status" aria-live="polite">Il risultato non viene salvato e scompare chiudendo o ricaricando la pagina.</p>
+      </section>
+    </main>
+
+    <section class="privacy" aria-label="Informazioni sulla sicurezza">
+      <article><span class="privacy-icon" aria-hidden="true">01</span><div><h3>Generazione locale</h3><p>La casualità deriva da <code>crypto.getRandomValues()</code> del browser, con campionamento senza bias.</p></div></article>
+      <article><span class="privacy-icon" aria-hidden="true">02</span><div><h3>Nessun tracciamento</h3><p>Nessuna libreria esterna, pubblicità, API, cookie o archiviazione delle password.</p></div></article>
+      <article><span class="privacy-icon" aria-hidden="true">03</span><div><h3>Codice verificabile</h3><p>Il codice è pubblico; per password particolarmente sensibili preferisci una copia locale verificata.</p></div></article>
+    </section>
+    <footer>Progetto open source · <a href="https://github.com/massimilianopal/passphrase-italiane" rel="noopener noreferrer">Codice su GitHub</a> · Dizionario di <a href="https://www.taringamberini.com/it/diceware_it_IT/lista-di-parole-diceware-in-italiano/" rel="noopener noreferrer">Tarin Gamberini</a> (GPLv3)</footer>
+  </div>
+</body>
+</html>

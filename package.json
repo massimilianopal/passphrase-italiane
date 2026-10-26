@@ -1,0 +1,10 @@
+{
+  "name": "passphrase-italiane",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generatore di passphrase italiane e modalità Telemaco",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}
