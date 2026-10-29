@@ -7,10 +7,10 @@ Generatore **statico e open source** di passphrase italiane con una modalità de
 - **Passphrase italiane:** da 4 a 10 voci indipendenti selezionate dalla lista Diceware italiana v4 di Tarin Gamberini. Predefinita la selezione fra le **6.859 voci alfabetiche** di lunghezza 3–6 caratteri; disponibile anche la lista integrale di 7.776 voci (che include numeri e simboli).
 - Separatore configurabile, maiuscole iniziali e cifra finale opzionale.
 - Stima dell'entropia teorica calcolata sul numero effettivo di voci selezionabili.
-- **Telemaco:** 20 caratteri, quattro gruppi pronunciabili da 4 lettere CVCV non presenti come parole complete nella lista Diceware, due cifre e due simboli estratti da `!?*:.`. Maiuscola casuale facoltativa; verifica facoltativa dello user ID.
+- **Telemaco:** modalità specifica di **20 caratteri**, con gruppi separati dal punto (che vale già come simbolo consentito) e due cifre finali, oppure una cifra e un simbolo aggiuntivo `!?*:`. Due stili: **parole italiane** brevi dalla lista Diceware (tre gruppi, 15 lettere complessive) oppure **gruppi pronunciabili inventati** (quattro gruppi, 14 lettere). Maiuscola iniziale facoltativa; esclusione facoltativa dello user ID. Esempi di sola struttura: `Fiume.carta.salto.73` e `Pepo.rida.vuza.il.42`.
 - Risultato e user ID conservati solo in memoria finché la pagina è aperta.
 
-**Attenzione:** la modalità Telemaco verifica esclusivamente le regole note implementabili localmente. Non può conoscere le password precedenti, il grado di somiglianza con la password attuale, tutti i nomi propri o gli eventuali dizionari proprietari adottati da InfoCamere. Un risultato potrebbe comunque essere rifiutato dal sito.
+**Attenzione:** le parole vere rendono la password più semplice da leggere, ma possono essere respinte dalle regole contro parole comuni o nomi propri. Inoltre la loro selezione avviene da un insieme più limitato rispetto alle password casuali di Bitwarden: per sistemi che lo permettono, privilegiare passphrase Diceware più lunghe. La modalità Telemaco verifica esclusivamente le regole note implementabili localmente. Non può conoscere le password precedenti, il grado di somiglianza con la password attuale, tutti i nomi propri o gli eventuali dizionari proprietari adottati da InfoCamere. Un risultato potrebbe comunque essere rifiutato dal sito.
 
 ## Sicurezza e modello di minaccia
 

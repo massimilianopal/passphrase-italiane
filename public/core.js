@@ -58,6 +58,58 @@ export function makeSyllablePool(fullWordlist) {
   return pool;
 }
 
+// Valori alfabetici disponibili nei formati Telemaco.
+// Niente nomi propri nella piccola lista delle particelle; la lista generale
+// non permette di riconoscere automaticamente tutti i nomi propri.
+const SHORT_PARTICLES = Object.freeze([
+  "al", "ai", "ci", "da", "di", "ed", "fa", "fu", "ha", "ho", "il",
+  "in", "io", "la", "le", "lo", "ma", "me", "mi", "ne", "no", "re",
+  "sa", "se", "si", "so", "su", "te", "ti", "tu", "un", "va", "vi"
+]);
+
+// Tre parole naturali (lunghezza complessiva 15) + 3 punti + 2 cifre.
+// Gli ordinamenti sono equiprobabili; nessun termine è scelto a mano.
+export const TELEMACO_WORD_PATTERNS = Object.freeze([
+  Object.freeze([5, 5, 5]),
+  Object.freeze([4, 5, 6]),
+  Object.freeze([4, 6, 5]),
+  Object.freeze([5, 4, 6]),
+  Object.freeze([5, 6, 4]),
+  Object.freeze([6, 4, 5]),
+  Object.freeze([6, 5, 4])
+]);
+
+const EXCLUDED = new Set([
+  "roma", "mario", "maria", "marco", "paolo", "luigi", "giulia",
+  "milano", "napoli", "torino", "parigi", "italia", "admin",
+  "qwert", "infocam", "password", "telemaco"
+]);
+
+export function makeTelemacoPools(fullWordlist) {
+  if (!Array.isArray(fullWordlist) || fullWordlist.length < 2) {
+    throw new RangeError("Dizionario non disponibile.");
+  }
+  const italiane = {4: [], 5: [], 6: []};
+  for (const entry of fullWordlist) {
+    if (/^[a-z]{4,6}$/.test(entry) &&
+        !EXCLUDED.has(entry) &&
+        !/(.)\1\1/.test(entry) &&
+        /[aeiou]/.test(entry)) {
+      italiane[entry.length].push(entry);
+    }
+  }
+  for (const length of [4, 5, 6]) {
+    if (italiane[length].length < 10) throw new Error("Dizionario di parole troppo ridotto.");
+  }
+  const invented = makeSyllablePool(fullWordlist);
+  const short = [...new Set([
+    ...SHORT_PARTICLES,
+    ...Array.from("bcdfghlmnpqrstvz").flatMap(consonant =>
+      Array.from("aeiou").map(vowel => consonant + vowel))
+  ])];
+  return {italiane, invented, short};
+}
+
 export function validateTelemaco(value, username = "") {
   const errors = [];
   if (value.length < 8 || value.length > 20) errors.push("La lunghezza deve essere fra 8 e 20 caratteri.");
@@ -85,31 +137,40 @@ export function validateTelemaco(value, username = "") {
   return [...new Set(errors)];
 }
 
-function capitalizeOneLetter(value) {
-  const target = randomInt(16);
-  let seen = 0;
-  return [...value].map(ch => {
-    if (!/[a-z]/.test(ch)) return ch;
-    const result = seen === target ? ch.toUpperCase() : ch;
-    seen++;
-    return result;
-  }).join("");
-}
-
-export function generateTelemaco(pool, username = "", uppercase = true) {
-  if (!Array.isArray(pool) || pool.length < 2) throw new RangeError("Dizionario gruppi non disponibile.");
-  // 16 lettere in 4 gruppi CVCV, 2 simboli ammessi e 2 cifre = esattamente 20 caratteri.
+export function generateTelemaco(pools, username = "", uppercase = true, options = {}) {
+  const style = options.style ?? "italiane";
+  const ending = options.ending ?? "digits";
+  if (!pools?.italiane || !Array.isArray(pools.invented) || !Array.isArray(pools.short) ||
+      !["italiane", "inventate"].includes(style) ||
+      !["digits", "symbol"].includes(ending)) {
+    throw new RangeError("Parametri Telemaco non validi.");
+  }
+  const lastSymbols = ["!", "?", "*", ":"];
   for (let attempt = 0; attempt < 2000; attempt++) {
-    const parts = Array.from({length: 4}, () => pool[randomInt(pool.length)]);
-    let candidate = parts[0] + SYMBOLS[randomInt(SYMBOLS.length)] + parts[1]
-      + randomInt(10) + parts[2] + SYMBOLS[randomInt(SYMBOLS.length)]
-      + parts[3] + randomInt(10);
-    if (uppercase) candidate = capitalizeOneLetter(candidate);
+    let parts;
+    let entropyUpperBound;
+    if (style === "italiane") {
+      const template = TELEMACO_WORD_PATTERNS[randomInt(TELEMACO_WORD_PATTERNS.length)];
+      const selectedPools = template.map(length => pools.italiane[length]);
+      parts = selectedPools.map(pool => pool[randomInt(pool.length)]);
+      // Limite superiore riferito al template selezionato e alla sua scelta.
+      entropyUpperBound = Math.log2(TELEMACO_WORD_PATTERNS.length)
+        + selectedPools.reduce((value, pool) => value + Math.log2(pool.length), 0);
+    } else {
+      parts = Array.from({length: 3}, () => pools.invented[randomInt(pools.invented.length)]);
+      parts.push(pools.short[randomInt(pools.short.length)]);
+      entropyUpperBound = 3 * Math.log2(pools.invented.length) + Math.log2(pools.short.length);
+    }
+    if (new Set(parts).size !== parts.length) continue;
+    if (uppercase) parts[0] = parts[0][0].toUpperCase() + parts[0].slice(1);
+    const suffix = ending === "digits"
+      ? String(randomInt(10)) + String(randomInt(10))
+      : String(randomInt(10)) + lastSymbols[randomInt(lastSymbols.length)];
+    const candidate = parts.join(".") + "." + suffix;
     if (validateTelemaco(candidate, username).length === 0) {
-      // Massimo teorico prima dei filtri sullo user ID e sulle sequenze vietate.
-      const entropyUpperBound = 4 * Math.log2(pool.length) + 2 * Math.log2(5) + 2 * Math.log2(10) + (uppercase ? Math.log2(16) : 0);
-      return {password: candidate, entropyUpperBound, poolSize:pool.length};
+      entropyUpperBound += ending === "digits" ? Math.log2(100) : Math.log2(40);
+      return {password: candidate, entropyUpperBound, style, ending};
     }
   }
-  throw new Error("Impossibile rispettare i vincoli con questo user ID. Verifica il valore inserito.");
+  throw new Error("Impossibile generare una password compatibile. Verifica lo user ID o riprova.");
 }
