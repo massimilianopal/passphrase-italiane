@@ -55,7 +55,21 @@
       </section>
 
       <section id="panel-telemaco" class="settings" role="tabpanel" aria-labelledby="tab-telemaco" hidden>
-        <div class="section-heading"><div><h2>Compatibilità Telemaco</h2><p>Gruppi pronunciabili, non parole di dizionario.</p></div><span class="pill">20 caratteri</span></div>
+        <div class="section-heading"><div><h2>Compatibilità Telemaco</h2><p>Parole brevi separate da punti, facili da trascrivere.</p></div><span class="pill">20 caratteri</span></div>
+        <div class="two-cols">
+          <div class="control"><label for="telemaco-style">Stile delle parole</label>
+            <select id="telemaco-style">
+              <option value="italiane">Parole italiane</option>
+              <option value="inventate">Parole inventate pronunciabili</option>
+            </select>
+          </div>
+          <div class="control"><label for="telemaco-ending">Finale</label>
+            <select id="telemaco-ending">
+              <option value="digits">Due cifre (es. .42)</option>
+              <option value="symbol">Cifra e simbolo (es. .4!)</option>
+            </select>
+          </div>
+        </div>
         <div class="control"><label for="username">User ID da escludere <span class="optional">(facoltativo)</span></label>
           <input id="username" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Inseriscilo solo se vuoi escluderlo">
           <p class="hint">Usato soltanto per il controllo in memoria; non viene trasmesso né salvato.</p>
@@ -63,8 +77,8 @@
         <label class="check"><input type="checkbox" id="telemaco-uppercase" checked> Inserisci una lettera maiuscola casuale</label>
         <div class="rules">
           <strong>Regole applicate localmente</strong>
-          <p>20 caratteri, lettere e numeri, simboli tra <code>! ? * : .</code>, niente tre caratteri identici consecutivi, sequenze banali note o parole complete della lista nei singoli gruppi.</p>
-          <p><strong>Limite:</strong> Telemaco può comunque rifiutare una proposta per nomi propri, somiglianza con password precedenti o altri controlli non documentati.</p>
+          <p>20 caratteri: parole o gruppi brevi separati da punti, due cifre finali oppure una cifra e un simbolo tra <code>! ? * :</code>. Sono escluse alcune sequenze banali, ripetizioni e lo user ID, se indicato.</p>
+          <p><strong>Limite:</strong> Telemaco può comunque rifiutare le parole comuni, i nomi propri, password simili a quelle precedenti o sequenze non individuate dal controllo locale. Lo stile con parole inventate evita più facilmente le parole di dizionario.</p>
         </div>
       </section>
 

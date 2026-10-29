@@ -1,9 +1,9 @@
 import {WORDS_IT} from "./data/italiano-v4.js";
-import {alphabeticWords, generatePhrase, generateTelemaco, makeSyllablePool} from "./core.js";
+import {alphabeticWords, generatePhrase, generateTelemaco, makeTelemacoPools} from "./core.js";
 
 const byId = id => document.getElementById(id);
 const alpha = alphabeticWords(WORDS_IT);
-const pronounceable = makeSyllablePool(WORDS_IT);
+const telemacoPools = makeTelemacoPools(WORDS_IT);
 const tabs = [byId("tab-italiano"), byId("tab-telemaco")];
 let mode = "italiano";
 let currentPassword = "";
@@ -73,10 +73,13 @@ byId("generate").addEventListener("click", () => {
       byId("entropy").textContent = "Entropia teorica: " + generated.entropy.toFixed(1) + " bit";
       setStatus("Estratta da " + generated.poolSize.toLocaleString("it-IT") + " voci. Nessuna frase salvata.");
     } else {
-      const generated = generateTelemaco(pronounceable, byId("username").value, byId("telemaco-uppercase").checked);
+      const generated = generateTelemaco(telemacoPools, byId("username").value, byId("telemaco-uppercase").checked, {
+        style: byId("telemaco-style").value,
+        ending: byId("telemaco-ending").value
+      });
       currentPassword = generated.password;
-      byId("entropy").textContent = "Massimo teorico: " + generated.entropyUpperBound.toFixed(1) + " bit";
-      setStatus("Controlli locali superati. Il servizio Telemaco può applicare ulteriori verifiche.");
+      byId("entropy").textContent = "Limite teorico (prima dei filtri): " + generated.entropyUpperBound.toFixed(1) + " bit";
+      setStatus("Controlli locali superati. Le parole comuni e i nomi propri potrebbero essere rifiutati da Telemaco.");
     }
     isHidden = false;
     byId("result").classList.remove("masked");
